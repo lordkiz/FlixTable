@@ -75,6 +75,8 @@ export const Table: FunctionComponent<TableProps> = ({
               data={{columns: columnTitleData[0], values: columnTitleData[1]}}
               onCellPress={columnTitleCellPressed}
               cellContainerStyle={{backgroundColor: Colors.extraLightDark}}
+              showSortIcon
+              sortCriteria={sortCriteria}
             />
             <View style={styles.separator} />
           </>

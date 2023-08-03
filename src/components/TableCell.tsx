@@ -34,7 +34,7 @@ export const TableCell: FunctionComponent<TableCellProps> = ({
   data,
   demarcate = false,
   icon,
-  iconPosition = 'left',
+  iconPosition = 'right',
   onCellPress,
 }) => {
   return (
