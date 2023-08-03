@@ -2,6 +2,12 @@ import {FunctionComponent, ReactNode, useMemo, useState} from 'react';
 import {FlatList, ScrollView, StyleSheet, View} from 'react-native';
 import {Colors} from '../utils/constants';
 import {TableRow} from './TableRow';
+import {
+  SortCriteria,
+  useProcessedData,
+  OrderedData,
+} from '../utils/hooks/useProcessedData';
+import {CellPressEventData} from './TableCell';
 
 export type TableData = Array<Record<string, ReactNode>>;
 
@@ -23,27 +29,25 @@ export const Table: FunctionComponent<TableProps> = ({
   onColumnTitleCellPressed,
   onColumnCellPressed,
 }) => {
-  const [columnSortedBy, setColumnSortedBy] = useState<
-    | {
-        column: string;
-        sortDirection: 'ASC' | 'DESC';
-      }
-    | undefined
-  >(undefined);
+  const [sortCriteria, setSortCriteria] = useState<SortCriteria>(undefined);
 
-  const dataForHeader = useMemo(() => {
-    if (!data.length) return {};
-    const res: TableData[0] = {};
-    // Based on the provided typing for user, we can be sure(??) that each field will be present
-    // TODO:- Confirm if there can be missing fields
-    Object.keys(data[0]).forEach(
-      k => (res[k] = k.charAt(0).toUpperCase() + k.substring(1)),
-    );
-    return res;
-  }, [data]);
+  const {processedData, columnTitleData} = useProcessedData(data, sortCriteria);
 
-  const columnTitleCellPressed = (cellItem: TableData[0]) => {
-    onColumnTitleCellPressed?.(cellItem);
+  const columnTitleCellPressed = (cellPressEventData: CellPressEventData) => {
+    if (!!sortCriteria && sortCriteria.column === cellPressEventData.column) {
+      // just toggle
+      setSortCriteria({
+        column: cellPressEventData.column,
+        sortDirection: sortCriteria.sortDirection === 'ASC' ? 'DESC' : 'ASC',
+      });
+    } else {
+      setSortCriteria({
+        column: cellPressEventData.column,
+        sortDirection: 'ASC',
+      });
+    }
+
+    onColumnTitleCellPressed?.(cellPressEventData);
   };
 
   if (!data || !data.length) {
@@ -55,18 +59,22 @@ export const Table: FunctionComponent<TableProps> = ({
       style={styles.container}
       horizontal
       showsHorizontalScrollIndicator={false}>
-      <FlatList<TableData[0]>
-        data={data}
+      <FlatList<OrderedData[0]>
+        data={processedData}
         renderItem={({item}) => (
-          <TableRow data={item} onCellPress={onColumnCellPressed} />
+          <TableRow
+            data={{columns: item[0], values: item[1]}}
+            onCellPress={onColumnCellPressed}
+          />
         )}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         keyExtractor={(_, index) => `item-${index}`}
         ListHeaderComponent={() => (
           <>
             <TableRow
-              data={dataForHeader}
-              onCellPress={onColumnTitleCellPressed}
+              data={{columns: columnTitleData[0], values: columnTitleData[1]}}
+              onCellPress={columnTitleCellPressed}
+              cellContainerStyle={{backgroundColor: Colors.extraLightDark}}
             />
             <View style={styles.separator} />
           </>

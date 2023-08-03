@@ -1,25 +1,33 @@
-import {FunctionComponent, ReactNode} from 'react';
-import {TableCell, TableCellProps} from './TableCell';
-import {StyleSheet, View} from 'react-native';
+import {FunctionComponent} from 'react';
+import {CellPressEventData, TableCell} from './TableCell';
+import {StyleSheet, View, ViewStyle} from 'react-native';
 import {TableData} from './Table';
+import {ColumnValueTuple} from '../utils/hooks/useProcessedData';
 
 export interface TableRowProps {
-  data: TableData[0];
-  onCellPress?: (data: TableData[0]) => void;
+  data: {columns: ColumnValueTuple[0]; values: ColumnValueTuple[1]};
+  onCellPress?: (data: CellPressEventData) => void;
+  cellContainerStyle?: ViewStyle;
 }
 
-export const TableRow: FunctionComponent<TableRowProps> = ({data}) => {
-  const cells = Object.keys(data);
+export const TableRow: FunctionComponent<TableRowProps> = ({
+  data,
+  onCellPress,
+  cellContainerStyle,
+}) => {
   return (
     <View style={styles.container}>
-      {cells.map((key, index) => {
-        const showRightBorder = cells.length > 1 && index + 1 !== cells.length;
+      {data.columns.map((columnName, index) => {
+        const showRightBorder =
+          data.columns.length > 1 && index + 1 !== data.columns.length;
         return (
           <TableCell
-            key={key}
-            data={{column: key, value: data[key]}}
-            demarcate={showRightBorder}>
-            {data[key]}
+            key={index}
+            data={{column: columnName, value: data.values[index]}}
+            demarcate={showRightBorder}
+            onCellPress={onCellPress}
+            containerStyle={cellContainerStyle}>
+            {data.values[index]}
           </TableCell>
         );
       })}

@@ -1,4 +1,9 @@
-import {FunctionComponent, PropsWithChildren, ReactElement} from 'react';
+import {
+  FunctionComponent,
+  PropsWithChildren,
+  ReactElement,
+  ReactNode,
+} from 'react';
 import {
   StyleSheet,
   Text,
@@ -9,13 +14,18 @@ import {
 import {Colors} from '../utils/constants';
 import {TableData} from './Table';
 
+export type CellPressEventData = {
+  column: string;
+  value: ReactNode;
+};
+
 export interface TableCellProps extends PropsWithChildren {
-  data: TableData[0];
+  data: CellPressEventData;
   containerStyle?: ViewStyle;
   icon?: ReactElement;
   iconPosition?: 'left' | 'right';
   demarcate?: boolean;
-  onCellPress?: (data: TableCellProps['data']) => void;
+  onCellPress?: (data: CellPressEventData) => void;
 }
 
 export const TableCell: FunctionComponent<TableCellProps> = ({

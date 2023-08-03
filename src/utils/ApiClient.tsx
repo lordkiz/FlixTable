@@ -23,12 +23,10 @@ export class HttpClient {
     },
     {
       name: 'Alexander',
-      age: 32,
       nick: 'string',
       friends: 2,
       sur: 'string',
       bro: 4,
-      par: 'string',
       sdr: 2,
       re: 'string',
       fs: 4,
