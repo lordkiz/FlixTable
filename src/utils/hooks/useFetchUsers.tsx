@@ -29,9 +29,9 @@ export const useFetchUsers = () => {
     setLoading(false);
   };
 
-  const retry = () => {
+  const retry = async () => {
     setError(null);
-    getData();
+    await getData();
   };
 
   useEffect(() => {

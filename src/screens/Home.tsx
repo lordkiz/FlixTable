@@ -1,14 +1,6 @@
-import {FunctionComponent, useMemo} from 'react';
+import {FunctionComponent} from 'react';
 import {useFetchUsers} from '../utils/hooks/useFetchUsers';
-import {
-  ActivityIndicator,
-  FlatList,
-  ScrollView,
-  StyleSheet,
-  View,
-} from 'react-native';
-import {TableRow, TableRowProps} from '../components/TableRow';
-import {Colors} from '../utils/constants';
+import {ActivityIndicator, View} from 'react-native';
 import {Table} from '../components/Table';
 
 export const Home: FunctionComponent = () => {

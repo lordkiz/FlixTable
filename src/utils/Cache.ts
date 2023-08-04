@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useEffect, useState} from 'react';
 import {User} from './ApiClient';
 
 export const Cache = {
@@ -31,7 +30,7 @@ export const Cache = {
 
 export const USER_DATA_CACHE_KEY = 'USER_DATA_CACHE_KEY';
 
-const VALIDITY_PERIOD = 3600000; // 1 hour
+export const VALIDITY_PERIOD = 3600000; // 1 hour
 
 interface UserCacheData {
   data: User[];
@@ -42,7 +41,7 @@ interface UserCacheData {
  * Use this function to test that the data previously saved is actually a UserCacheData
  * This is important to ensure you don't return unexpected data from the Cache
  */
-const isUserCacheData = (data: any): data is UserCacheData => {
+export const isUserCacheData = (data: any): data is UserCacheData => {
   return data && data.data && data.savedAt && typeof data.savedAt === 'number';
 };
 
