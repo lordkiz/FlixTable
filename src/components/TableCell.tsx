@@ -12,7 +12,6 @@ import {
   ViewStyle,
 } from 'react-native';
 import {Colors} from '../utils/constants';
-import {TableData} from './Table';
 
 export type CellPressEventData = {
   column: string;

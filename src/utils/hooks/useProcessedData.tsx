@@ -23,15 +23,40 @@ export const useProcessedData = (
    *
    * STEP 2: Process data. If any data is missing a value, populate with nullish value.
    * This is important so a cell without data is not occupied by a another cell
-   * which may not belong to that column
+   * which may not belong to that column. This ensures there is an entry for every cell.
    *
    * STEP 3: Sort based on the sort criteria. If sort criteria is undefined, return
    * original data.
    */
   /** */
 
+  /** Returns all keys in the data in the correct order
+   *  Useful for ordering the columns
+   */
   const allKeysInData = useMemo(() => {
     let allKeys = new Set<string>();
+    let indexWithMostKeys = 0;
+    let mostKeys = 0;
+    // first find which index has the most keys
+    data.forEach((d, i) => {
+      const l = Object.keys(d).length;
+      if (l > mostKeys) {
+        indexWithMostKeys = i;
+        mostKeys = l;
+      }
+    });
+    // first copy all the keys in the index with most keys
+    // the item at this index likely has the most complete set of keys
+    // in order to preserve ordering these keys should be added first.
+    // Without this step, missing data from values index 0 can cause wrong
+    // ordering of the columns
+    if (data.length) {
+      Object.keys(data[indexWithMostKeys]).forEach(k => {
+        allKeys.add(k);
+      });
+    }
+    // then add all the other keys incase a key was missed
+    // this can be optional if there is a guarantee that atleast 1 item has all keys
     data.forEach(d => {
       Object.keys(d).forEach(k => {
         allKeys.add(k);
@@ -62,6 +87,15 @@ export const useProcessedData = (
     });
   };
 
+  /** Process the data. Ensures every cell is not empty.
+   * Adheres to the ordering of allKeysInData
+   *  @returns OrderedData
+   * @example
+   * [
+   *   [["name", "age"],["Michael", 24]],
+   *   [["name", "age"],["Julian", 42]]
+   * ]
+   * */
   const processedData = useMemo<OrderedData>(() => {
     const allNeededKeys = allKeysInData;
     const res: OrderedData = [];
@@ -76,6 +110,12 @@ export const useProcessedData = (
     return res;
   }, [data, sortCriteria]);
 
+  /** Processes the data ideal for rendering the column header row and titles
+   * @returns ColumnValueTuple
+   * @example
+   * [["name", "age"],["Name", "Age"]]
+   *
+   */
   const columnTitleData = useMemo<ColumnValueTuple>(() => {
     const values: ReactNode[] = [];
     for (let i = 0; i < allKeysInData.length; i++) {

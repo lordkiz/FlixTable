@@ -1,5 +1,6 @@
 import {useEffect, useState} from 'react';
 import {HttpClient} from '../ApiClient';
+import {withValidUsersCacheData} from '../Cache';
 
 export const useFetchUsers = () => {
   const [loading, setLoading] = useState(false);
@@ -8,12 +9,24 @@ export const useFetchUsers = () => {
     Awaited<ReturnType<(typeof HttpClient)['fetchUsers']>> | undefined
   >(undefined);
 
-  const getData = () => {
+  const {getValidCacheData, persistUserData} = withValidUsersCacheData();
+
+  const getData = async () => {
     setLoading(true);
-    HttpClient.fetchUsers()
-      .then(users => setData(users))
-      .catch(e => setError(composeError(e)))
-      .finally(() => setLoading(false));
+    const validData = await getValidCacheData();
+    if (validData) {
+      setData(validData);
+      setLoading(false);
+      return;
+    }
+    try {
+      const remoteData = await HttpClient.fetchUsers();
+      persistUserData(remoteData);
+      setData(remoteData);
+    } catch (e) {
+      setError(composeError(e));
+    }
+    setLoading(false);
   };
 
   const retry = () => {
